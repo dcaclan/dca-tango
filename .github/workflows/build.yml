@@ -8,7 +8,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Tools
         run: sudo apt-get update && sudo apt-get install -y build-essential gcc-aarch64-linux-gnu bc libelf-dev bison flex libssl-dev
-      - name: Kernel
+      - name: Kernel 6.6
         run: git clone --depth=1 https://github.com/torvalds/linux.git -b v6.6 kernel-src
       - name: Compile
         run: |
@@ -16,7 +16,7 @@ jobs:
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
           cd ..
-          make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-error=all" modules
+          make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-error=all -Wno-all" modules
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
