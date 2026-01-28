@@ -1,7 +1,7 @@
 obj-m += tango32.o
 
 all:
-	make -C $(KERNEL_SRC) M=$(M) modules
+	make -C $(KDIR) M=$(PWD) modules
 
 clean:
-	make -C $(KERNEL_SRC) M=$(M) clean
+	make -C $(KDIR) M=$(PWD) clean
