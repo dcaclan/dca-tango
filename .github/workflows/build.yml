@@ -16,7 +16,7 @@ jobs:
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
           cd ..
-          make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-error=all -Wno-error=incompatible-pointer-types" modules
+          make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-error=all" modules
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
