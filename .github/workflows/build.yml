@@ -25,10 +25,10 @@ jobs:
 
       - name: Compile
         run: |
-          make -C $GITHUB_WORKSPACE/kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
+          make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
 
-      - name: Upload
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: tango32_ko_driver
-          path: $GITHUB_WORKSPACE/tango32.ko
+          path: "**/*.ko"
