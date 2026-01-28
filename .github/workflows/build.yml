@@ -1,11 +1,11 @@
-name: TANGO_BUILD_FINAL
+name: TANGO_BUILD_6_6_FINAL
 on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Tools
@@ -13,22 +13,24 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential gcc-aarch64-linux-gnu bc libelf-dev bison flex libssl-dev
 
-      - name: Get Compatible Kernel
+      - name: Get Kernel 6.6 Source
         run: |
-          git clone --depth=1 https://github.com/torvalds/linux.git -b v5.10 kernel-src
+          # Kernel 6.6 branch clone kar rahe hain aapke 6.6.89 kernel ke liye
+          git clone --depth=1 https://github.com/torvalds/linux.git -b v6.6 kernel-src
 
-      - name: Prepare Kernel
+      - name: Prepare Kernel Headers
         run: |
           cd kernel-src
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
 
-      - name: Compile
+      - name: Compile tango32.ko
         run: |
+          # Modernized code ko compile kar rahe hain
           make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
 
-      - name: Upload Artifact
+      - name: Upload tango32.ko
         uses: actions/upload-artifact@v4
         with:
-          name: tango32_ko_driver
+          name: tango32_6.6_driver
           path: "**/*.ko"
