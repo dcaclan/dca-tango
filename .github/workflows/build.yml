@@ -1,0 +1,22 @@
+name: DCA_Tango_Build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Compiler
+        run: sudo apt-get update && sudo apt-get install -y build-essential gcc-aarch64-linux-gnu
+      - name: Get Kernel Headers
+        run: git clone --depth=1 https://github.com/torvalds/linux.git -b master kernel-src
+      - name: Compile
+        run: |
+          cd kernel-src
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- M=$GITHUB_WORKSPACE modules
+      - name: Save Driver
+        uses: actions/upload-artifact@v3
+        with:
+          name: tango32_ko_file
+          path: ./*.ko
