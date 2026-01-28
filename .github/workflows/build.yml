@@ -1,4 +1,4 @@
-name: TANGO_GKI_A16_FINAL
+name: TANGO_A16_FINAL_FIX
 on: [push, workflow_dispatch]
 
 jobs:
@@ -14,17 +14,17 @@ jobs:
       - name: Get Android Common Kernel
         run: git clone --depth=1 https://android.googlesource.com/kernel/common -b android15-6.6 kernel-src
 
-      - name: Exact Version Matching
+      - name: Exact Version Matching (Limit Fix)
         run: |
           cd kernel-src
-          # Character limit bypass karne ke liye EXTRAVERSION ko chota rakha hai
+          # Character limit error se bachne ke liye sirf base suffix yahan rakha hai
           sed -i 's/^EXTRAVERSION =.*/EXTRAVERSION = -android15-8/' Makefile
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
 
       - name: Compile tango32.ko
         run: |
-          # Baaki ka version string LOCALVERSION se pass kar rahe hain
+          # Baaki ka version magic LOCALVERSION ke zariye exact match kar rahe hain
           make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
           LOCALVERSION="-g8e4be6b47e40-ab14134548-4k" \
           KBUILD_MODPOST_WARN=1 KCFLAGS="-Wno-error=all" modules
@@ -32,5 +32,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: tango32_a16_driver
+          name: tango32_final_a16
           path: "**/*.ko"
