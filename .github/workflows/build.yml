@@ -1,0 +1,34 @@
+name: TANGO_BUILD_FINAL
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-aarch64-linux-gnu bc libelf-dev bison flex libssl-dev
+
+      - name: Get Compatible Kernel
+        run: |
+          git clone --depth=1 https://github.com/torvalds/linux.git -b v5.10 kernel-src
+
+      - name: Prepare Kernel
+        run: |
+          cd kernel-src
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
+
+      - name: Compile
+        run: |
+          make -C $GITHUB_WORKSPACE/kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: tango32_ko_driver
+          path: $GITHUB_WORKSPACE/tango32.ko
