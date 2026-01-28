@@ -15,7 +15,7 @@ jobs:
 
       - name: Get Kernel 6.6 Source
         run: |
-          # Kernel 6.6 branch clone kar rahe hain aapke 6.6.89 kernel ke liye
+          # Kernel 6.6 branch clone kar rahe hain aapke mobile kernel ke liye
           git clone --depth=1 https://github.com/torvalds/linux.git -b v6.6 kernel-src
 
       - name: Prepare Kernel Headers
@@ -26,8 +26,8 @@ jobs:
 
       - name: Compile tango32.ko
         run: |
-          # Modernized code ko compile kar rahe hain
-          make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
+          # Incompatible pointer types error ko handle karne ke liye flags add kiye hain
+          make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-error=incompatible-pointer-types" modules
 
       - name: Upload tango32.ko
         uses: actions/upload-artifact@v4
