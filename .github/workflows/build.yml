@@ -1,4 +1,4 @@
-name: TANGO_GKI_FINAL
+name: TANGO_FINAL_A16
 on: [push, workflow_dispatch]
 
 jobs:
@@ -15,24 +15,24 @@ jobs:
 
       - name: Get Android Common Kernel
         run: |
-          # Android 15 ki GKI branch use kar rahe hain
+          # Android 15-6.6 GKI branch hi base hai aapke version ka
           git clone --depth=1 https://android.googlesource.com/kernel/common -b android15-6.6 kernel-src
 
       - name: Exact Version Matching
         run: |
           cd kernel-src
-          # Aapke kernel ka exact suffix yahan set kiya hai
-          sed -i 's/^EXTRAVERSION =.*/EXTRAVERSION = -android15-8-g8e4be6b47e40/' Makefile
+          # Aapke kernel ka exact suffix yahan set kiya hai jo 'uname -r' se match karega
+          sed -i 's/^EXTRAVERSION =.*/EXTRAVERSION = -android15-8-g8e4be6b47e40-ab14134548-4k/' Makefile
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
 
       - name: Compile tango32.ko
         run: |
-          # GKI symbols match karne ke liye KBUILD flag zaroori hai
+          # Modpost warnings ko ignore kar rahe hain taaki .ko file har haal mein generate ho
           make -C kernel-src M=$GITHUB_WORKSPACE ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KBUILD_MODPOST_WARN=1 KCFLAGS="-Wno-error=all" modules
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tango32_GKI_final
+          name: tango32_final_ko
           path: "**/*.ko"
