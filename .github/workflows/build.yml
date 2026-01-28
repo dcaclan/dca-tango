@@ -1,16 +1,16 @@
-name: TANGO_BUILD_6_6_FINAL
+name: TANGO_FIX_FINAL
 on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Tools
+      - name: Tools
         run: sudo apt-get update && sudo apt-get install -y build-essential gcc-aarch64-linux-gnu bc libelf-dev bison flex libssl-dev
-      - name: Get Kernel 6.6
+      - name: Kernel
         run: git clone --depth=1 https://github.com/torvalds/linux.git -b v6.6 kernel-src
-      - name: Build
+      - name: Compile
         run: |
           cd kernel-src
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
@@ -20,5 +20,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: tango32_6.6_driver
+          name: tango32_ko
           path: "**/*.ko"
