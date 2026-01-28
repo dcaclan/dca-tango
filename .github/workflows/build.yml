@@ -22,7 +22,8 @@ jobs:
           cd kernel-src
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- M=$GITHUB_WORKSPACE modules
+          cd ..
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KERNEL_SRC=$GITHUB_WORKSPACE/kernel-src M=$GITHUB_WORKSPACE modules
 
       - name: Upload Driver Artifact
         uses: actions/upload-artifact@v4
