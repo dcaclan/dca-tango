@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0
 #include <linux/module.h>
+#include <linux/kernel.h>
 #include <linux/fs.h>
 #include <linux/miscdevice.h>
 #include <linux/uaccess.h>
 #include <linux/compat.h>
+#include <linux/sched.h>
 #include "tango32.h"
 
 static long tango32_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
     void __user *argp = (void __user *)arg;
     struct tango32_abi_version abi = { .major = TANGO32_ABI_MAJOR, .minor = TANGO32_ABI_MINOR };
 
-    // Kernel 6.6 compatibility: Direct thread flag check
     if (test_thread_flag(TIF_32BIT)) return -EINVAL;
 
     if (cmd == TANGO32_GET_VERSION) {
@@ -21,7 +22,6 @@ static long tango32_ioctl(struct file *file, unsigned int cmd, unsigned long arg
         if (copy_to_user(argp, &abi, sizeof(abi))) return -EFAULT;
         return 0;
     }
-
     return -ENOIOCTLCMD;
 }
 
@@ -38,5 +38,11 @@ static struct miscdevice t_dev = {
     .mode = 0666,
 };
 
-module_misc_device(t_dev);
+static int __init t_init(void) { return misc_register(&t_dev); }
+static void __exit t_exit(void) { misc_deregister(&t_dev); }
+
+module_init(t_init);
+module_exit(t_exit);
+
 MODULE_LICENSE("GPL");
+MODULE_AUTHOR("DCA");
